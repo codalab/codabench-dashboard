@@ -1,0 +1,36 @@
+/** Approximate lat/lng centroids for the inferred-country labels. Ported from dist/globe.html. */
+export const GEO: Record<string, [number, number]> = {
+  France: [46.6, 2.4],
+  USA: [39.8, -98.6],
+  "United Kingdom": [54, -2],
+  Germany: [51, 10],
+  Spain: [40, -3.7],
+  Italy: [42.8, 12.8],
+  Netherlands: [52.1, 5.3],
+  Switzerland: [46.8, 8.2],
+  Belgium: [50.6, 4.7],
+  Austria: [47.5, 14.5],
+  Portugal: [39.5, -8],
+  Poland: [52, 19],
+  Sweden: [62, 15],
+  Norway: [62, 10],
+  Finland: [64, 26],
+  Denmark: [56, 10],
+  Ireland: [53, -8],
+  Greece: [39, 22],
+  Russia: [61, 90],
+  China: [35, 105],
+  Japan: [36, 138],
+  "South Korea": [36.5, 127.8],
+  India: [22, 79],
+  Singapore: [1.35, 103.8],
+  Australia: [-25, 133],
+  Canada: [56, -106],
+  Brazil: [-14, -51],
+  Mexico: [23, -102],
+  Israel: [31, 35],
+  Turkey: [39, 35],
+};
+
+/** Codabench's inferred home base (Paris-Saclay / LISN) — the hub every arc connects to. */
+export const HUB = { name: "Codabench · France", lat: 48.71, lng: 2.17 };

@@ -1,0 +1,137 @@
+@import "tailwindcss";
+
+/* Dark navy is the default look (no toggle needed to see it) — a light
+   variant is available via the theme toggle, using the dataviz-validated
+   light palette so both modes stay accessible. */
+:root {
+  color-scheme: dark;
+
+  --bg-page: #0f1420;
+  --bg-surface: #182030;
+  --bg-surface-2: #1f2940;
+  --bg-surface-hover: #212c44;
+
+  --text-primary: #e6ecf5;
+  --text-secondary: #a9b4c9;
+  --text-muted: #8a97b1;
+
+  --border-hairline: #2a3650;
+  --border-strong: #3a4970;
+
+  --accent: #4f8cff;
+  --accent-hover: #6ea1ff;
+  --accent-soft: #1c2c4a;
+  --accent-ink: #ffffff;
+
+  --chart-series-1: #4f8cff;
+
+  /* Fixed-order categorical palette (validated: worst adjacent CVD ΔE 8.4,
+     normal-vision floor 19.3 on the dark surface) — one color per field
+     identity, never reassigned by rank. */
+  --series-1: #3987e5;
+  --series-2: #008300;
+  --series-3: #d55181;
+  --series-4: #c98500;
+  --series-5: #199e70;
+  --series-6: #d95926;
+  --series-7: #9085e9;
+  --series-other: #565f76;
+
+  --success-text: #36d399;
+}
+
+:root[data-theme="light"] {
+  color-scheme: light;
+
+  --bg-page: #f9f9f7;
+  --bg-surface: #fcfcfb;
+  --bg-surface-2: #f2f1ee;
+  --bg-surface-hover: #eeede9;
+
+  --text-primary: #0b0b0b;
+  --text-secondary: #52514e;
+  --text-muted: #898781;
+
+  --border-hairline: #e1e0d9;
+  --border-strong: #c3c2b7;
+
+  --accent: #2a78d6;
+  --accent-hover: #1c5cab;
+  --accent-soft: #e6effa;
+  --accent-ink: #ffffff;
+
+  --chart-series-1: #2a78d6;
+
+  --series-1: #2a78d6;
+  --series-2: #008300;
+  --series-3: #e87ba4;
+  --series-4: #eda100;
+  --series-5: #1baf7a;
+  --series-6: #eb6834;
+  --series-7: #4a3aa7;
+  --series-other: #a3a08f;
+
+  --success-text: #006300;
+}
+
+@theme inline {
+  --color-page: var(--bg-page);
+  --color-surface: var(--bg-surface);
+  --color-surface-2: var(--bg-surface-2);
+  --color-surface-hover: var(--bg-surface-hover);
+
+  --color-ink: var(--text-primary);
+  --color-ink-secondary: var(--text-secondary);
+  --color-ink-muted: var(--text-muted);
+
+  --color-hairline: var(--border-hairline);
+  --color-strong: var(--border-strong);
+
+  --color-accent: var(--accent);
+  --color-accent-hover: var(--accent-hover);
+  --color-accent-soft: var(--accent-soft);
+  --color-accent-ink: var(--accent-ink);
+
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+* {
+  border-color: var(--border-hairline);
+}
+
+body {
+  background: var(--bg-page);
+  color: var(--text-primary);
+}
+
+::selection {
+  background: var(--accent-soft);
+}
+
+/* Slim, unobtrusive scrollbars that still respect the theme */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--border-strong) transparent;
+}
+*::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+*::-webkit-scrollbar-thumb {
+  background: var(--border-strong);
+  border-radius: 999px;
+  border: 2px solid transparent;
+  background-clip: content-box;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

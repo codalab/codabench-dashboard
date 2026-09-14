@@ -1,0 +1,58 @@
+[
+  {
+    "key": "1d699bd7-59e5-45fd-98eb-50f7ec276401",
+    "name": "input_data @ '02-03-2023 07:46'",
+    "type": "input_data",
+    "phase": "Phase 1",
+    "task": "Task Phase 1",
+    "size": 454819.84
+  },
+  {
+    "key": "1f73fa55-4895-4078-bb86-586da6b32fa8",
+    "name": "scoring_program @ '02-03-2023 07:46'",
+    "type": "scoring_program",
+    "phase": "Phase 1",
+    "task": "Task Phase 1",
+    "size": 1853.44
+  },
+  {
+    "key": "f641df01-c26f-4e8c-aef2-3d64d45ca218",
+    "name": "reference_data @ '02-03-2023 07:46'",
+    "type": "reference_data",
+    "phase": "Phase 1",
+    "task": "Task Phase 1",
+    "size": 1443.84
+  },
+  {
+    "key": "40ca62e7-4f3a-45a1-a55d-440b6b8a9e66",
+    "name": "solution @ 02-03-2023 07:46",
+    "type": "solution",
+    "phase": "Phase 1",
+    "task": "Task Phase 1",
+    "size": 1177.6
+  },
+  {
+    "key": "afa1570c-99ab-4a92-ba26-dc5a9fbecc1d",
+    "name": "input_data @ '02-03-2023 07:46'",
+    "type": "input_data",
+    "phase": "Phase 2",
+    "task": "Task Phase 2",
+    "size": 454819.84
+  },
+  {
+    "key": "8d9507b6-7c51-4b70-a721-db4b3e11039e",
+    "name": "scoring_program @ '02-03-2023 07:46'",
+    "type": "scoring_program",
+    "phase": "Phase 2",
+    "task": "Task Phase 2",
+    "size": 1853.44
+  },
+  {
+    "key": "6b1c72f4-0680-400d-987f-41935eb9dcd7",
+    "name": "reference_data @ '02-03-2023 07:46'",
+    "type": "reference_data",
+    "phase": "Phase 2",
+    "task": "Task Phase 2",
+    "size": 1116.16
+  }
+]

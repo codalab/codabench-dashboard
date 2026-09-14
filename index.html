@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Codabench Competitions Dashboard</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<style>
+  :root {
+    --bg: #0f1420; --panel: #182030; --panel2: #1f2940; --line: #2a3650;
+    --text: #e6ecf5; --muted: #8a97b1; --accent: #4f8cff; --accent2: #36d399;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    background: var(--bg); color: var(--text); font-size: 14px;
+  }
+  header {
+    padding: 18px 24px; border-bottom: 1px solid var(--line);
+    display: flex; align-items: baseline; gap: 14px;
+  }
+  header h1 { margin: 0; font-size: 20px; }
+  header .sub { color: var(--muted); font-size: 13px; }
+  .layout { display: grid; grid-template-columns: 280px 1fr; gap: 0; }
+  /* Sidebar */
+  aside {
+    padding: 18px; border-right: 1px solid var(--line); height: calc(100vh - 60px);
+    overflow-y: auto; position: sticky; top: 0;
+  }
+  aside h2 { font-size: 13px; text-transform: uppercase; letter-spacing: .5px; color: var(--muted); margin: 18px 0 8px; }
+  aside h2:first-child { margin-top: 0; }
+  .search { width: 100%; padding: 9px 11px; border-radius: 8px; border: 1px solid var(--line);
+    background: var(--panel); color: var(--text); }
+  .group { display: flex; flex-direction: column; gap: 4px; max-height: 220px; overflow-y: auto; }
+  .chk { display: flex; align-items: center; gap: 8px; padding: 4px 6px; border-radius: 6px; cursor: pointer; }
+  .chk:hover { background: var(--panel2); }
+  .chk input { accent-color: var(--accent); }
+  .chk .ct { margin-left: auto; color: var(--muted); font-variant-numeric: tabular-nums; }
+  .modeRow { display: flex; gap: 6px; margin-top: 6px; }
+  .modeRow button, .btn {
+    flex: 1; padding: 7px; border-radius: 7px; border: 1px solid var(--line);
+    background: var(--panel); color: var(--text); cursor: pointer; font-size: 13px;
+  }
+  .modeRow button.active { background: var(--accent); border-color: var(--accent); color: #fff; }
+  .btn:hover { border-color: var(--accent); }
+  /* Main */
+  main { padding: 18px 24px; min-width: 0; }
+  .kpis { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-bottom: 18px; }
+  .kpi { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 14px 16px; }
+  .kpi .v { font-size: 26px; font-weight: 700; }
+  .kpi .l { color: var(--muted); font-size: 12px; margin-top: 2px; }
+  .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px; }
+  .card { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 14px 16px; }
+  .card h3 { margin: 0 0 10px; font-size: 14px; }
+  .card .canvasWrap { position: relative; height: 280px; }
+  /* Table */
+  .tableCard { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 14px 16px; }
+  .tableTop { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  th, td { text-align: left; padding: 8px 10px; border-bottom: 1px solid var(--line); vertical-align: top; }
+  th { color: var(--muted); font-weight: 600; cursor: pointer; user-select: none; position: sticky; top: 0; background: var(--panel); }
+  th:hover { color: var(--text); }
+  .tableScroll { max-height: 460px; overflow-y: auto; }
+  .tag { display: inline-block; padding: 2px 7px; border-radius: 20px; font-size: 11px; margin: 1px 2px;
+    background: var(--panel2); border: 1px solid var(--line); color: var(--muted); white-space: nowrap; }
+  a { color: var(--accent); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  .muted { color: var(--muted); }
+</style>
+</head>
+<body>
+<header>
+  <h1>🏆 Codabench Competitions</h1>
+  <nav style="margin-left:4px"><a href="index.html" style="color:var(--accent);margin-right:14px;text-decoration:none">Dashboard</a><a href="map.html" style="color:var(--muted);margin-right:14px;text-decoration:none">🗺️ Map</a><a href="globe.html" style="color:var(--muted);margin-right:14px;text-decoration:none">🌐 Globe</a></nav>
+  <span class="sub">Fields, sectors &amp; conferences inferred from title + description (keyword rules in taxonomy.py)</span>
+</header>
+
+<div class="layout">
+  <aside>
+    <h2>Search</h2>
+    <input id="search" class="search" type="text" placeholder="title / organizer…" />
+
+    <h2>Tag match mode</h2>
+    <div class="modeRow">
+      <button id="modeOr" class="active">Any (OR)</button>
+      <button id="modeAnd">All (AND)</button>
+    </div>
+
+    <h2>Research field</h2>
+    <div id="fDomains" class="group"></div>
+
+    <h2>Application sector</h2>
+    <div id="fSectors" class="group"></div>
+
+    <h2>Conference / venue</h2>
+    <div id="fConfs" class="group"></div>
+
+    <h2>Country <span class="muted" style="text-transform:none;font-weight:400">(inferred)</span></h2>
+    <div id="fCountries" class="group"></div>
+
+    <h2>&nbsp;</h2>
+    <button id="reset" class="btn">↺ Reset all filters</button>
+  </aside>
+
+  <main>
+    <div class="kpis">
+      <div class="kpi"><div class="v" id="kCount">0</div><div class="l">Competitions (filtered)</div></div>
+      <div class="kpi"><div class="v" id="kOrgs">0</div><div class="l">Distinct organizers</div></div>
+      <div class="kpi"><div class="v" id="kField">0</div><div class="l">Tagged with a field</div></div>
+      <div class="kpi"><div class="v" id="kConf">0</div><div class="l">Linked to a conference</div></div>
+    </div>
+
+    <div class="grid2">
+      <div class="card"><h3>By research field</h3><div class="canvasWrap"><canvas id="chDomains"></canvas></div></div>
+      <div class="card"><h3>By application sector</h3><div class="canvasWrap"><canvas id="chSectors"></canvas></div></div>
+    </div>
+    <div class="grid2">
+      <div class="card"><h3>Top organizers</h3><div class="canvasWrap"><canvas id="chOrgs"></canvas></div></div>
+      <div class="card"><h3>By conference / venue</h3><div class="canvasWrap"><canvas id="chConfs"></canvas></div></div>
+    </div>
+    <div class="grid2">
+      <div class="card" style="grid-column: 1 / -1;"><h3>By country <span class="muted">(inferred from text)</span></h3><div class="canvasWrap"><canvas id="chCountries"></canvas></div></div>
+    </div>
+
+    <div class="tableCard">
+      <div class="tableTop">
+        <h3 style="margin:0">Competitions (<span id="tCount">0</span>)</h3>
+        <button id="download" class="btn" style="flex:0 0 auto; padding:7px 14px;">⬇️ Download filtered CSV</button>
+      </div>
+      <div class="tableScroll">
+        <table>
+          <thead><tr>
+            <th data-sort="id">ID</th>
+            <th data-sort="title">Title</th>
+            <th data-sort="organizer">Organizer</th>
+            <th>Field</th>
+            <th>Sector</th>
+            <th>Conference</th>
+            <th>Country</th>
+            <th>Link</th>
+          </tr></thead>
+          <tbody id="tbody"></tbody>
+        </table>
+      </div>
+    </div>
+  </main>
+</div>
+
+<script src="data.js"></script>
+<script>
+const COMPS = DATA.competitions;
+const state = {
+  mode: "or",
+  domains: new Set(), sectors: new Set(), conferences: new Set(), countries: new Set(),
+  search: "", sortKey: "id", sortDir: 1,
+};
+const charts = {};
+const PALETTE = ["#4f8cff","#36d399","#fbbd23","#f87272","#a78bfa","#22d3ee","#fb923c","#34d399","#e879f9","#60a5fa"];
+
+// ---- filtering ----
+function tagMatch(itemTags, selected) {
+  if (selected.size === 0) return true;
+  if (state.mode === "and") { for (const s of selected) if (!itemTags.includes(s)) return false; return true; }
+  for (const s of selected) if (itemTags.includes(s)) return true;
+  return false;
+}
+function filtered() {
+  const q = state.search.toLowerCase();
+  return COMPS.filter(c =>
+    tagMatch(c.domains, state.domains) &&
+    tagMatch(c.sectors, state.sectors) &&
+    tagMatch(c.conferences, state.conferences) &&
+    tagMatch(c.countries, state.countries) &&
+    (q === "" || (c.title + " " + c.organizer).toLowerCase().includes(q))
+  );
+}
+function countBy(rows, key) {
+  const m = new Map();
+  rows.forEach(r => r[key].forEach(t => m.set(t, (m.get(t) || 0) + 1)));
+  return [...m.entries()].sort((a, b) => b[1] - a[1]);
+}
+function countOrgs(rows, n) {
+  const m = new Map();
+  rows.forEach(r => m.set(r.organizer, (m.get(r.organizer) || 0) + 1));
+  return [...m.entries()].sort((a, b) => b[1] - a[1]).slice(0, n);
+}
+
+// ---- charts ----
+Chart.defaults.color = "#8a97b1";
+Chart.defaults.borderColor = "#2a3650";
+function barChart(id, pairs, horiz = true) {
+  const ctx = document.getElementById(id);
+  const data = {
+    labels: pairs.map(p => p[0]),
+    datasets: [{ data: pairs.map(p => p[1]), backgroundColor: "#4f8cff", borderRadius: 4 }],
+  };
+  const opts = {
+    indexAxis: horiz ? "y" : "x", responsive: true, maintainAspectRatio: false,
+    plugins: { legend: { display: false } },
+    scales: { x: { grid: { color: "#212c44" } }, y: { grid: { display: false } } },
+  };
+  if (charts[id]) { charts[id].data = data; charts[id].update(); }
+  else charts[id] = new Chart(ctx, { type: "bar", data, options: opts });
+}
+function doughnut(id, pairs) {
+  const ctx = document.getElementById(id);
+  const data = {
+    labels: pairs.map(p => p[0]),
+    datasets: [{ data: pairs.map(p => p[1]), backgroundColor: pairs.map((_, i) => PALETTE[i % PALETTE.length]) }],
+  };
+  const opts = {
+    responsive: true, maintainAspectRatio: false, cutout: "55%",
+    plugins: { legend: { position: "right", labels: { boxWidth: 12, font: { size: 11 } } } },
+  };
+  if (charts[id]) { charts[id].data = data; charts[id].update(); }
+  else charts[id] = new Chart(ctx, { type: "doughnut", data, options: opts });
+}
+
+// ---- table ----
+function tagSpans(arr) { return arr.map(t => `<span class="tag">${t}</span>`).join("") || '<span class="muted">—</span>'; }
+function renderTable(rows) {
+  const k = state.sortKey, d = state.sortDir;
+  const sorted = [...rows].sort((a, b) => {
+    let x = a[k], y = b[k];
+    if (typeof x === "string") return x.localeCompare(y) * d;
+    return (x - y) * d;
+  });
+  const body = sorted.map(c => `<tr>
+    <td>${c.id}</td>
+    <td>${c.title}</td>
+    <td>${c.organizer}</td>
+    <td>${tagSpans(c.domains)}</td>
+    <td>${tagSpans(c.sectors)}</td>
+    <td>${tagSpans(c.conferences)}</td>
+    <td>${tagSpans(c.countries)}</td>
+    <td><a href="${c.url}" target="_blank" rel="noopener">open ↗</a></td>
+  </tr>`).join("");
+  document.getElementById("tbody").innerHTML = body;
+  document.getElementById("tCount").textContent = rows.length.toLocaleString();
+}
+
+// ---- render everything ----
+function render() {
+  const rows = filtered();
+  document.getElementById("kCount").textContent = rows.length.toLocaleString();
+  document.getElementById("kOrgs").textContent = new Set(rows.map(r => r.organizer)).size.toLocaleString();
+  document.getElementById("kField").textContent = rows.filter(r => r.domains.length).length.toLocaleString();
+  document.getElementById("kConf").textContent = rows.filter(r => r.conferences.length).length.toLocaleString();
+
+  barChart("chDomains", countBy(rows, "domains"));
+  barChart("chSectors", countBy(rows, "sectors"));
+  barChart("chOrgs", countOrgs(rows, 12));
+  doughnut("chConfs", countBy(rows, "conferences"));
+  barChart("chCountries", countBy(rows, "countries"), false);
+  renderTable(rows);
+}
+
+// ---- build filter checkboxes (with live counts over ALL data) ----
+function buildGroup(elId, names, stateSet, tagKey) {
+  const el = document.getElementById(elId);
+  const totals = countBy(COMPS, tagKey);
+  const tmap = new Map(totals);
+  el.innerHTML = names.map(n =>
+    `<label class="chk"><input type="checkbox" value="${n}" /><span>${n}</span><span class="ct">${tmap.get(n) || 0}</span></label>`
+  ).join("");
+  el.querySelectorAll("input").forEach(inp => inp.addEventListener("change", () => {
+    inp.checked ? stateSet.add(inp.value) : stateSet.delete(inp.value);
+    render();
+  }));
+}
+
+// ---- CSV export ----
+function downloadCSV() {
+  const rows = filtered();
+  const esc = v => `"${String(v).replace(/"/g, '""')}"`;
+  const head = ["id","title","organizer","url","domains","sectors","conferences","countries"];
+  const lines = [head.join(",")].concat(rows.map(c => [
+    c.id, esc(c.title), esc(c.organizer), esc(c.url),
+    esc(c.domains.join("; ")), esc(c.sectors.join("; ")), esc(c.conferences.join("; ")), esc(c.countries.join("; "))
+  ].join(",")));
+  const blob = new Blob([lines.join("\n")], { type: "text/csv" });
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob); a.download = "codabench_filtered.csv"; a.click();
+  URL.revokeObjectURL(a.href);
+}
+
+// ---- wire up ----
+buildGroup("fDomains", DATA.domains, state.domains, "domains");
+buildGroup("fSectors", DATA.sectors, state.sectors, "sectors");
+buildGroup("fConfs", DATA.conferences, state.conferences, "conferences");
+buildGroup("fCountries", DATA.countries, state.countries, "countries");
+
+document.getElementById("search").addEventListener("input", e => { state.search = e.target.value; render(); });
+document.getElementById("modeOr").addEventListener("click", () => setMode("or"));
+document.getElementById("modeAnd").addEventListener("click", () => setMode("and"));
+function setMode(m) {
+  state.mode = m;
+  document.getElementById("modeOr").classList.toggle("active", m === "or");
+  document.getElementById("modeAnd").classList.toggle("active", m === "and");
+  render();
+}
+document.querySelectorAll("th[data-sort]").forEach(th => th.addEventListener("click", () => {
+  const k = th.dataset.sort;
+  state.sortDir = state.sortKey === k ? -state.sortDir : 1;
+  state.sortKey = k;
+  renderTable(filtered());
+}));
+document.getElementById("download").addEventListener("click", downloadCSV);
+document.getElementById("reset").addEventListener("click", () => {
+  state.domains.clear(); state.sectors.clear(); state.conferences.clear(); state.countries.clear();
+  state.search = ""; document.getElementById("search").value = "";
+  document.querySelectorAll("aside input[type=checkbox]").forEach(c => c.checked = false);
+  setMode("or");
+});
+
+render();
+</script>
+</body>
+</html>
