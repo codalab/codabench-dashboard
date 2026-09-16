@@ -1,0 +1,178 @@
+[
+  {
+    "key": "cd7a436b-c107-42b2-ac42-91a39f5a6a60",
+    "name": "Scoring program - Chameleon",
+    "type": "scoring_program",
+    "phase": "Phase 1",
+    "task": "task 0",
+    "size": 14540.8
+  },
+  {
+    "key": "5dd7a77d-90ce-4cb6-b9b9-7c11068c9747",
+    "name": "Ingestion program - Chameleon",
+    "type": "ingestion_program",
+    "phase": "Phase 1",
+    "task": "task 0",
+    "size": 10987.52
+  },
+  {
+    "key": "d61f0573-abd3-45ad-93f3-a693686ad825",
+    "name": "task 0 input_data",
+    "type": "input_data",
+    "phase": "Phase 1",
+    "task": "task 0",
+    "size": 29644789.76
+  },
+  {
+    "key": "e2205bb3-121b-4aa7-87c9-b242c7b647ac",
+    "name": "task 0 reference_data",
+    "type": "reference_data",
+    "phase": "Phase 1",
+    "task": "task 0",
+    "size": 29644789.76
+  },
+  {
+    "key": "bae4be1b-701d-45d1-bafc-98285c75153e",
+    "name": "task 1 input_data",
+    "type": "input_data",
+    "phase": "Phase 1",
+    "task": "task 1",
+    "size": 24812298.24
+  },
+  {
+    "key": "15bda96a-fbc7-4740-a92e-08f6326338f6",
+    "name": "task 1 reference_data",
+    "type": "reference_data",
+    "phase": "Phase 1",
+    "task": "task 1",
+    "size": 24812298.24
+  },
+  {
+    "key": "7f01504c-64e2-4c6b-9e97-5bf0370faa9c",
+    "name": "task 2 input_data",
+    "type": "input_data",
+    "phase": "Phase 1",
+    "task": "task 2",
+    "size": 13825075.2
+  },
+  {
+    "key": "9f04e68c-dc97-4c42-bb25-4b505c27d246",
+    "name": "task 2 reference_data",
+    "type": "reference_data",
+    "phase": "Phase 1",
+    "task": "task 2",
+    "size": 13825075.2
+  },
+  {
+    "key": "640baee0-5e67-423f-8b88-057995ab4cf7",
+    "name": "task 3 reference_data",
+    "type": "reference_data",
+    "phase": "Phase 1",
+    "task": "task 3",
+    "size": 19056834.56
+  },
+  {
+    "key": "1f2f3d77-de9b-4d55-a1e0-4f1ed6a88886",
+    "name": "task 3 input_data",
+    "type": "input_data",
+    "phase": "Phase 1",
+    "task": "task 3",
+    "size": 19056834.56
+  },
+  {
+    "key": "f1346c50-966b-44b5-bf8d-c53e8ef33e93",
+    "name": "task 4 reference_data",
+    "type": "reference_data",
+    "phase": "Phase 1",
+    "task": "task 4",
+    "size": 19056834.56
+  },
+  {
+    "key": "e28563cf-6976-41b9-b211-5e4f9952b6b0",
+    "name": "task 4 input_data",
+    "type": "input_data",
+    "phase": "Phase 1",
+    "task": "task 4",
+    "size": 19056834.56
+  },
+  {
+    "key": "2375e20c-d065-424b-a8d8-9b9dc5d80738",
+    "name": "task 5 reference_data",
+    "type": "reference_data",
+    "phase": "Phase 2",
+    "task": "task 5",
+    "size": 22626416.64
+  },
+  {
+    "key": "8789974a-8a32-4dc2-96a1-3c6b4b334744",
+    "name": "task 5 input_data",
+    "type": "input_data",
+    "phase": "Phase 2",
+    "task": "task 5",
+    "size": 22626416.64
+  },
+  {
+    "key": "29d090d2-509a-447a-b877-af8dac757535",
+    "name": "task 6 reference_data",
+    "type": "reference_data",
+    "phase": "Phase 2",
+    "task": "task 6",
+    "size": 22578565.12
+  },
+  {
+    "key": "85bf6e92-12d8-40f9-be8c-4ad4d93ad12a",
+    "name": "task 6 input_data",
+    "type": "input_data",
+    "phase": "Phase 2",
+    "task": "task 6",
+    "size": 22578565.12
+  },
+  {
+    "key": "897029c0-f283-4cdb-abde-136faaa94b69",
+    "name": "task 7 reference_data",
+    "type": "reference_data",
+    "phase": "Phase 2",
+    "task": "task 7",
+    "size": 17610997.76
+  },
+  {
+    "key": "0b05f43d-b8a0-4732-a37e-f7b6b34f37ab",
+    "name": "task 7 input_data",
+    "type": "input_data",
+    "phase": "Phase 2",
+    "task": "task 7",
+    "size": 17610997.76
+  },
+  {
+    "key": "b5f50bad-7805-4b72-8f9b-ffbd4d59ab2e",
+    "name": "task 8 reference_data",
+    "type": "reference_data",
+    "phase": "Phase 2",
+    "task": "task 8",
+    "size": 24876748.8
+  },
+  {
+    "key": "fd17ffa6-74f7-43cf-916d-6952c7198e81",
+    "name": "task 8 input_data",
+    "type": "input_data",
+    "phase": "Phase 2",
+    "task": "task 8",
+    "size": 24876748.8
+  },
+  {
+    "key": "dc7ebd40-4c0c-41a6-bfef-bed2fef95fdf",
+    "name": "task 9 reference_data",
+    "type": "reference_data",
+    "phase": "Phase 2",
+    "task": "task 9",
+    "size": 20552499.2
+  },
+  {
+    "key": "51dd25d2-2413-49f3-80f1-a67a63a2c4fe",
+    "name": "task 9 input_data",
+    "type": "input_data",
+    "phase": "Phase 2",
+    "task": "task 9",
+    "size": 20552499.2
+  }
+]

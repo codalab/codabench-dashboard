@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Codabench — Global Activity Globe</title>
+<script src="https://unpkg.com/globe.gl@2.32.0/dist/globe.gl.min.js"></script>
+<style>
+  :root { --bg:#070b14; --text:#e6ecf5; --muted:#8a97b1; --accent:#4f8cff; }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; height: 100%; background: var(--bg); color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; overflow: hidden; }
+  #globe { position: absolute; inset: 0; }
+  .overlay { position: absolute; z-index: 5; pointer-events: none; }
+  header.overlay { top: 0; left: 0; right: 0; padding: 16px 24px;
+    background: linear-gradient(180deg, rgba(7,11,20,.85), rgba(7,11,20,0)); }
+  header h1 { margin: 0; font-size: 20px; }
+  header p { margin: 4px 0 0; color: var(--muted); font-size: 13px; max-width: 640px; }
+  nav { margin-top: 8px; pointer-events: auto; }
+  nav a { color: var(--muted); margin-right: 14px; text-decoration: none; font-size: 14px; }
+  nav a.active, nav a:hover { color: var(--accent); }
+  .legend { bottom: 18px; left: 24px; background: rgba(24,32,48,.7); border: 1px solid #2a3650;
+    border-radius: 10px; padding: 12px 14px; font-size: 12px; pointer-events: auto; }
+  .legend .row { display: flex; align-items: center; gap: 8px; margin: 3px 0; color: var(--muted); }
+  .legend .dot { width: 10px; height: 10px; border-radius: 50%; }
+  .legend b { color: var(--text); }
+  .stats { bottom: 18px; right: 24px; background: rgba(24,32,48,.7); border: 1px solid #2a3650;
+    border-radius: 10px; padding: 12px 16px; text-align: right; }
+  .stats b { font-size: 22px; }
+  .stats span { color: var(--muted); font-size: 12px; }
+  .tt { color: var(--muted); }
+</style>
+</head>
+<body>
+<div id="globe"></div>
+
+<header class="overlay">
+  <h1>🌐 Codabench — Global Activity</h1>
+  <p>Submissions &amp; new challenges flowing toward the Codabench center in <b>France</b> (Université Paris-Saclay / LISN).
+     Each arc is a country that has hosted competitions; brighter, thicker arcs = more competitions.
+     Country is inferred from competition text, so this is an approximate view.</p>
+  <nav>
+    <a href="index.html">Dashboard</a>
+    <a href="map.html">🗺️ Map</a>
+    <a href="globe.html" class="active">🌐 Globe</a>
+  </nav>
+</header>
+
+<div class="overlay legend">
+  <div class="row"><span class="dot" style="background:#ffd34f"></span> <b>France</b> — Codabench center</div>
+  <div class="row"><span class="dot" style="background:#4f8cff"></span> Competition origin country</div>
+  <div class="row tt">Arc = activity toward France · thickness ∝ competitions</div>
+</div>
+
+<div class="overlay stats">
+  <div><b id="sComps">0</b> <span>competitions</span></div>
+  <div><b id="sCountries">0</b> <span>countries</span></div>
+</div>
+
+<script src="data.js"></script>
+<script>
+// Approximate lat/lng centroids for the inferred-country labels.
+const GEO = {
+  "France":[46.6,2.4],"USA":[39.8,-98.6],"United Kingdom":[54,-2],"Germany":[51,10],
+  "Spain":[40,-3.7],"Italy":[42.8,12.8],"Netherlands":[52.1,5.3],"Switzerland":[46.8,8.2],
+  "Belgium":[50.6,4.7],"Austria":[47.5,14.5],"Portugal":[39.5,-8],"Poland":[52,19],
+  "Sweden":[62,15],"Norway":[62,10],"Finland":[64,26],"Denmark":[56,10],"Ireland":[53,-8],
+  "Greece":[39,22],"Russia":[61,90],"China":[35,105],"Japan":[36,138],"South Korea":[36.5,127.8],
+  "India":[22,79],"Singapore":[1.35,103.8],"Australia":[-25,133],"Canada":[56,-106],
+  "Brazil":[-14,-51],"Mexico":[23,-102],"Israel":[31,35],"Turkey":[39,35],
+};
+const HUB = { name: "Codabench · France", lat: 48.71, lng: 2.17 }; // Paris-Saclay
+
+const COMPS = DATA.competitions;
+const counts = {};
+COMPS.forEach(c => c.countries.forEach(n => { if (GEO[n]) counts[n] = (counts[n] || 0) + 1; }));
+const countryList = Object.keys(counts);
+const maxCount = Math.max(1, ...Object.values(counts));
+
+document.getElementById("sCountries").textContent = countryList.length;
+document.getElementById("sComps").textContent =
+  new Set(COMPS.filter(c => c.countries.some(n => GEO[n])).map(c => c.id)).size;
+
+// Arcs: every origin country -> France hub.
+const arcs = countryList
+  .filter(n => n !== "France")
+  .map(n => ({
+    startLat: GEO[n][0], startLng: GEO[n][1],
+    endLat: HUB.lat, endLng: HUB.lng,
+    country: n, count: counts[n],
+    weight: counts[n] / maxCount,
+  }));
+
+// Points: France hub (big/gold) + each origin country (blue, sized by count).
+const points = [
+  { lat: HUB.lat, lng: HUB.lng, size: 0.9, color: "#ffd34f", label: HUB.name },
+  ...countryList.filter(n => n !== "France").map(n => ({
+    lat: GEO[n][0], lng: GEO[n][1],
+    size: 0.25 + 0.9 * (counts[n] / maxCount),
+    color: "#4f8cff",
+    label: `${n}: ${counts[n]} competition${counts[n] > 1 ? "s" : ""}`,
+  })),
+];
+if (counts["France"]) points[0].label = `${HUB.name}: ${counts["France"]} competitions`;
+
+const world = Globe()(document.getElementById("globe"))
+  .globeImageUrl("https://unpkg.com/three-globe@2.31.0/example/img/earth-night.jpg")
+  .backgroundColor("#070b14")
+  .atmosphereColor("#4f8cff")
+  .atmosphereAltitude(0.18)
+  // arcs
+  .arcsData(arcs)
+  .arcStartLat("startLat").arcStartLng("startLng")
+  .arcEndLat("endLat").arcEndLng("endLng")
+  .arcColor(d => [`rgba(79,140,255,${0.25 + 0.6 * d.weight})`, "rgba(255,211,79,0.9)"])
+  .arcStroke(d => 0.3 + 1.2 * d.weight)
+  .arcAltitude(d => 0.15 + 0.35 * d.weight)
+  .arcDashLength(0.4).arcDashGap(2)
+  .arcDashInitialGap(() => Math.random() * 5)
+  .arcDashAnimateTime(2000)
+  .arcLabel(d => `<b>${d.country} → France</b><br/>${d.count} competitions`)
+  // points
+  .pointsData(points)
+  .pointLat("lat").pointLng("lng").pointColor("color")
+  .pointRadius("size").pointAltitude(0.01)
+  .pointLabel("label")
+  // rings pulsing at the France hub
+  .ringsData([{ lat: HUB.lat, lng: HUB.lng }])
+  .ringColor(() => t => `rgba(255,211,79,${1 - t})`)
+  .ringMaxRadius(5).ringPropagationSpeed(2).ringRepeatPeriod(1200);
+
+// gentle auto-rotate, framed on Europe/France
+world.controls().autoRotate = true;
+world.controls().autoRotateSpeed = 0.55;
+world.pointOfView({ lat: 30, lng: 5, altitude: 2.3 }, 0);
+
+addEventListener("resize", () => {
+  world.width(innerWidth).height(innerHeight);
+});
+</script>
+</body>
+</html>

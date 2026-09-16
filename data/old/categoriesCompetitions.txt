@@ -1,0 +1,35 @@
+- mutlimedia (audio, video, images...)
+- textual linguistic
+- medicine
+- speech
+- economy (finance, urbanism, industry...)
+- geography and earth (climate, natural resource, agriculture...)
+- sociology (culture, social media, humanities, education...)
+- other
+
+second, I would like to find at most two valid tags among the following list:
+"supervised" 	Supervised learning (labels are given)
+"unsupervised" 	Unsupervised learning (no labels given)
+"rl" 	Reinforcement learning (actions to maximise reward)
+"control" 	Control problems (controlling a dynamical system)
+"classification" 	Classification (class labels)
+"regression" 	Regression (numerical labels)
+"ranking" 	Ranking (ranking sets of items)
+"segmentation" 	Segmentation (1) (2) (dividing something into parts with labels)
+"nlp" 	Natural Language Processing (language, or sequences of tokens)
+"tabular" 	Tabular data (structured, in rows and columns)
+"multimodal" 	Multi-modal data (e.g. audio + text)
+"timeseries" 	Time series analysis (anything with time series data)
+"forecasting" 	Forecasting (making predictions about the future)
+"causal" 	Causal inference (cause and effect)
+"automl" 	AutoML (competitions restricted to AutoML solutions)
+"graph" 	Learning on Graphs
+"optimisation" 	Optimisation (formal optimisation problems)
+"search" 	Search problems
+"safety" 	AI Safety (alignment, robustness, ,monitoring, etc)
+"security" 	Information security (virus detection, passwords, encryption, etc)
+"privacy" 	Privacy (privacy-enhancing ML, federated learning, etc)
+"meta" 	Meta learning (learning to learn)
+"reasoning" 	Logical reasoning or abstraction based challenges.
+"generative" 	A competition that focuses on generative models
+"deeplearning" 	A competition that requires the use of deep learning

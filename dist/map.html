@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Codabench Competitions — World Map</title>
+<script src="https://www.gstatic.com/charts/loader.js"></script>
+<style>
+  :root {
+    --bg: #0f1420; --panel: #182030; --panel2: #1f2940; --line: #2a3650;
+    --text: #e6ecf5; --muted: #8a97b1; --accent: #4f8cff;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; font-size: 14px; }
+  header { padding: 16px 24px; border-bottom: 1px solid var(--line); display: flex; align-items: baseline; gap: 16px; }
+  header h1 { margin: 0; font-size: 20px; }
+  nav a { color: var(--muted); margin-right: 14px; text-decoration: none; font-size: 14px; }
+  nav a.active, nav a:hover { color: var(--accent); }
+  main { padding: 20px 24px; max-width: 1200px; margin: 0 auto; }
+  .controls { display: flex; gap: 18px; flex-wrap: wrap; align-items: end; margin-bottom: 16px; }
+  .ctrl label { display: block; color: var(--muted); font-size: 12px; margin-bottom: 5px; }
+  select { padding: 8px 11px; border-radius: 8px; border: 1px solid var(--line);
+    background: var(--panel); color: var(--text); min-width: 190px; }
+  .note { color: var(--muted); font-size: 12px; margin-left: auto; max-width: 340px; }
+  .card { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 12px; }
+  #map { width: 100%; height: 520px; }
+  .kpis { display: flex; gap: 24px; margin: 14px 2px; color: var(--muted); }
+  .kpis b { color: var(--text); font-size: 18px; }
+  .panel { margin-top: 18px; }
+  .panel h3 { margin: 0 0 10px; font-size: 15px; }
+  ul.comps { list-style: none; padding: 0; margin: 0; max-height: 360px; overflow-y: auto; }
+  ul.comps li { padding: 8px 4px; border-bottom: 1px solid var(--line); }
+  ul.comps a { color: var(--text); text-decoration: none; }
+  ul.comps a:hover { color: var(--accent); }
+  ul.comps .org { color: var(--muted); font-size: 12px; }
+  .empty { color: var(--muted); padding: 12px 4px; }
+</style>
+</head>
+<body>
+<header>
+  <h1>🌍 Codabench — Competitions by Country</h1>
+  <nav>
+    <a href="index.html">Dashboard</a>
+    <a href="map.html" class="active">🗺️ Map</a>
+    <a href="globe.html">🌐 Globe</a>
+  </nav>
+</header>
+
+<main>
+  <div class="controls">
+    <div class="ctrl">
+      <label for="region">Region</label>
+      <select id="region">
+        <option value="world">World</option>
+        <option value="002">Africa</option>
+        <option value="019">Americas</option>
+        <option value="142">Asia</option>
+        <option value="150">Europe</option>
+        <option value="009">Oceania</option>
+        <option value="155">Western Europe</option>
+        <option value="151">Eastern Europe</option>
+        <option value="145">Middle East</option>
+      </select>
+    </div>
+    <div class="ctrl">
+      <label for="scheme">Color scheme</label>
+      <select id="scheme">
+        <option value="blue">Blue sequential</option>
+        <option value="green">Green sequential</option>
+        <option value="heat">Yellow → Red</option>
+        <option value="purple">Purple sequential</option>
+      </select>
+    </div>
+    <div class="note">
+      Country is <b>inferred from each competition's text</b> (Codabench has no country field),
+      so coverage is sparse and approximate. Click a country to list its competitions.
+    </div>
+  </div>
+
+  <div class="card"><div id="map"></div></div>
+
+  <div class="kpis">
+    <div><b id="kCountries">0</b> countries</div>
+    <div><b id="kComps">0</b> competitions geo-tagged</div>
+    <div><b id="kTop">–</b> most competitions</div>
+  </div>
+
+  <div class="panel card">
+    <h3 id="panelTitle">Click a country on the map</h3>
+    <ul class="comps" id="compList"></ul>
+    <div class="empty" id="emptyMsg">Select a country to see its competitions here.</div>
+  </div>
+</main>
+
+<script src="data.js"></script>
+<script>
+// Map our inferred country labels -> ISO-3166 alpha-2 codes GeoChart understands.
+const ISO = {
+  "France":"FR","USA":"US","United Kingdom":"GB","Germany":"DE","Spain":"ES","Italy":"IT",
+  "Netherlands":"NL","Switzerland":"CH","Belgium":"BE","Austria":"AT","Portugal":"PT",
+  "Poland":"PL","Sweden":"SE","Norway":"NO","Finland":"FI","Denmark":"DK","Ireland":"IE",
+  "Greece":"GR","Russia":"RU","China":"CN","Japan":"JP","South Korea":"KR","India":"IN",
+  "Singapore":"SG","Australia":"AU","Canada":"CA","Brazil":"BR","Mexico":"MX","Israel":"IL","Turkey":"TR",
+};
+const SCHEMES = {
+  blue:   ["#12203a", "#4f8cff"],
+  green:  ["#0f2a20", "#36d399"],
+  heat:   ["#fbbd23", "#f87272"],
+  purple: ["#241a3a", "#a78bfa"],
+};
+
+const COMPS = DATA.competitions;
+
+// Aggregate: country -> {count, comps[]}
+const byCountry = {};
+COMPS.forEach(c => c.countries.forEach(name => {
+  if (!ISO[name]) return;
+  (byCountry[name] = byCountry[name] || { count: 0, comps: [] });
+  byCountry[name].count++;
+  byCountry[name].comps.push(c);
+}));
+
+const codeToName = {};
+Object.keys(byCountry).forEach(n => codeToName[ISO[n]] = n);
+
+// KPIs
+const entries = Object.entries(byCountry).sort((a, b) => b[1].count - a[1].count);
+document.getElementById("kCountries").textContent = entries.length;
+document.getElementById("kComps").textContent = new Set(
+  COMPS.filter(c => c.countries.some(n => ISO[n])).map(c => c.id)
+).size;
+document.getElementById("kTop").textContent = entries.length
+  ? `${entries[0][0]} (${entries[0][1].count})` : "–";
+
+google.charts.load("current", { packages: ["geochart"] });
+google.charts.setOnLoadCallback(draw);
+
+let chart, dataTable;
+function draw() {
+  dataTable = google.visualization.arrayToDataTable([
+    ["Country", "Competitions"],
+    ...Object.keys(byCountry).map(n => [ISO[n], byCountry[n].count]),
+  ]);
+  chart = new google.visualization.GeoChart(document.getElementById("map"));
+  google.visualization.events.addListener(chart, "select", onSelect);
+  render();
+  window.addEventListener("resize", render);
+  document.getElementById("region").addEventListener("change", render);
+  document.getElementById("scheme").addEventListener("change", render);
+}
+
+function render() {
+  const region = document.getElementById("region").value;
+  const scheme = SCHEMES[document.getElementById("scheme").value];
+  chart.draw(dataTable, {
+    region: region,
+    colorAxis: { colors: scheme },
+    backgroundColor: "#182030",
+    datalessRegionColor: "#232f47",
+    defaultColor: "#232f47",
+    legend: { textStyle: { color: "#8a97b1" } },
+    tooltip: { textStyle: { color: "#111" } },
+    keepAspectRatio: true,
+  });
+}
+
+function onSelect() {
+  const sel = chart.getSelection();
+  if (!sel.length) return;
+  const code = dataTable.getValue(sel[0].row, 0);
+  showCountry(codeToName[code]);
+}
+
+function showCountry(name) {
+  const list = document.getElementById("compList");
+  const empty = document.getElementById("emptyMsg");
+  const rec = byCountry[name];
+  document.getElementById("panelTitle").textContent =
+    `${name} — ${rec.count} competition${rec.count > 1 ? "s" : ""}`;
+  empty.style.display = "none";
+  list.innerHTML = rec.comps
+    .sort((a, b) => a.title.localeCompare(b.title))
+    .map(c => `<li>
+      <a href="${c.url}" target="_blank" rel="noopener">${c.title} ↗</a>
+      <div class="org">by ${c.organizer}${c.domains.length ? " · " + c.domains.join(", ") : ""}</div>
+    </li>`).join("");
+}
+</script>
+</body>
+</html>
